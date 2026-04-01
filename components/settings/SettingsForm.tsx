@@ -564,12 +564,12 @@ function IntegrationsSection() {
   const [copied, setCopied] = useState<'url' | 'key' | null>(null)
   const [testing, setTesting] = useState(false)
   const [testResult, setTestResult] = useState<{ ok: boolean; msg: string } | null>(null)
-
-  const webhookUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/api/webhooks/leads`
-    : '/api/webhooks/leads'
+  // Initialise to a relative URL to match SSR output, then set the full URL
+  // in useEffect to avoid a hydration mismatch that crashes the page on mobile.
+  const [webhookUrl, setWebhookUrl] = useState('/api/webhooks/leads')
 
   useEffect(() => {
+    setWebhookUrl(`${window.location.origin}/api/webhooks/leads`)
     fetch('/api/settings/webhook')
       .then(r => r.json())
       .then(d => { setApiKey(d.webhook_api_key) })
@@ -590,7 +590,18 @@ function IntegrationsSection() {
 
   async function handleCopy(type: 'url' | 'key') {
     const text = type === 'url' ? webhookUrl : (apiKey ?? '')
-    await navigator.clipboard.writeText(text)
+    try {
+      await navigator.clipboard.writeText(text)
+    } catch {
+      // Fallback for mobile browsers where clipboard API is unavailable
+      const el = document.createElement('textarea')
+      el.value = text
+      el.style.cssText = 'position:fixed;opacity:0;pointer-events:none'
+      document.body.appendChild(el)
+      el.select()
+      document.execCommand('copy')
+      document.body.removeChild(el)
+    }
     setCopied(type)
     setTimeout(() => setCopied(null), 2000)
   }
@@ -851,7 +862,7 @@ function DoNotContactSection() {
 
       {showForm && (
         <form onSubmit={handleAdd} className="px-6 py-4 border-b border-gray-100 bg-red-50 space-y-3">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Phone</label>
               <input
