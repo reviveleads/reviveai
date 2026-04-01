@@ -18,7 +18,7 @@ import {
 import { clsx } from 'clsx'
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Leads', href: '/leads', icon: Users },
   { name: 'Conversations', href: '/conversations', icon: MessageSquare },
   { name: 'Appointments', href: '/appointments', icon: Calendar },
