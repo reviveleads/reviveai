@@ -44,15 +44,15 @@ export default function LeadsPageClient({ leads: initialLeads }: { leads: Lead[]
   })
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
+    <div className="p-4 md:p-8">
+      <div className="mb-6 md:mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Leads</h1>
         <p className="text-sm text-gray-500 mt-1">{leads.length} total leads</p>
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-3 mb-5">
-        <div className="relative flex-1 max-w-sm">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-5">
+        <div className="relative flex-1 sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
             type="text"
@@ -62,7 +62,7 @@ export default function LeadsPageClient({ leads: initialLeads }: { leads: Lead[]
             className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
           />
         </div>
-        <div className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
+        <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
           {STATUS_FILTERS.map(f => (
             <button
               key={f.value}
@@ -82,7 +82,8 @@ export default function LeadsPageClient({ leads: initialLeads }: { leads: Lead[]
 
       {/* Table */}
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full text-sm min-w-[700px]">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
               <th className="text-left px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Name</th>
@@ -130,6 +131,7 @@ export default function LeadsPageClient({ leads: initialLeads }: { leads: Lead[]
             ))}
           </tbody>
         </table>
+        </div>
         {filtered.length > 0 && (
           <div className="border-t border-gray-100 bg-gray-50 px-6 py-3 text-xs text-gray-500">
             Showing {filtered.length} of {leads.length} leads

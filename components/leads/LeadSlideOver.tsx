@@ -222,7 +222,7 @@ export default function LeadSlideOver({ leadId, onClose, onLeadUpdated }: Props)
       {/* Panel */}
       <div
         className={clsx(
-          'fixed right-0 top-0 h-full w-[560px] bg-white shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-out',
+          'fixed right-0 top-0 h-full w-full sm:w-[560px] bg-white shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-out',
           isOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >

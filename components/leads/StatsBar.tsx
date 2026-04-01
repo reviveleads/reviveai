@@ -17,7 +17,7 @@ const statItems = [
 
 export default function StatsBar({ stats }: Props) {
   return (
-    <div className="grid grid-cols-7 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
       {statItems.map(item => (
         <div
           key={item.key}

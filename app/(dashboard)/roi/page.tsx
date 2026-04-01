@@ -73,9 +73,9 @@ export default function ROIPage() {
   const { stats, timeline, reactivated_leads } = data
 
   return (
-    <div className="p-8 max-w-5xl">
+    <div className="p-4 md:p-8 max-w-5xl">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 md:mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">ROI Dashboard</h1>
           <p className="text-sm text-gray-500 mt-1">{monthName} — month to date</p>

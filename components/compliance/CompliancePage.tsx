@@ -180,7 +180,7 @@ export default function CompliancePage() {
   const settingsComplete = settings.legal_business_name && settings.state_of_operation
 
   return (
-    <div className="p-8 max-w-3xl print:p-4">
+    <div className="p-4 md:p-8 max-w-3xl print:p-4">
       {/* Header */}
       <div className="mb-8 print:mb-6">
         <div className="flex items-center gap-3 mb-2">

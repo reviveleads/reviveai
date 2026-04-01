@@ -127,7 +127,7 @@ export default function LeadDetailPage({
   }
 
   return (
-    <div className="p-8 max-w-5xl">
+    <div className="p-4 md:p-8 max-w-5xl">
       {/* Back */}
       <Link href="/leads" className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 transition-colors mb-6">
         <ArrowLeft className="h-4 w-4" /> Back to Leads
