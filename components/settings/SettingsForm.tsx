@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { Component, useEffect, useRef, useState } from 'react'
+import type { ErrorInfo, ReactNode } from 'react'
 import {
   Loader2, CheckCircle2, Save, Building2, Phone, User, Mail,
   AlertTriangle, Tag, Plus, Trash2, Car, Calendar,
@@ -8,6 +9,32 @@ import {
   TrendingUp, Ban, Upload, X,
 } from 'lucide-react'
 import { DealerIncentive, DoNotContactEntry } from '@/types'
+
+class SectionErrorBoundary extends Component<
+  { children: ReactNode; label: string },
+  { hasError: boolean }
+> {
+  constructor(props: { children: ReactNode; label: string }) {
+    super(props)
+    this.state = { hasError: false }
+  }
+  static getDerivedStateFromError() { return { hasError: true } }
+  componentDidCatch(err: Error, info: ErrorInfo) {
+    console.error(`[Settings/${this.props.label}] render error:`, err, info.componentStack)
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="rounded-xl border border-red-100 bg-red-50 px-6 py-5 text-sm text-red-700">
+          <p className="font-medium">Could not load {this.props.label}</p>
+          <p className="text-xs text-red-500 mt-1">Reload the page to try again.</p>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+
 interface DealershipSettings {
   dealership_name: string
   salesperson_name: string
@@ -49,6 +76,7 @@ export default function SettingsForm() {
     fetch('/api/settings')
       .then(r => r.json())
       .then(data => {
+        if (!data || typeof data !== 'object' || data.error) return
         setFields({
           dealership_name: data.dealership_name ?? '',
           salesperson_name: data.salesperson_name ?? '',
@@ -60,6 +88,7 @@ export default function SettingsForm() {
           monthly_plan_cost: String(data.monthly_plan_cost ?? 1500),
         })
       })
+      .catch(() => { /* network failure — keep defaults */ })
       .finally(() => setLoading(false))
   }, [])
 
@@ -232,22 +261,30 @@ export default function SettingsForm() {
 
       {/* Current Deals — separate section, own API */}
       <div className="mt-8">
-        <IncentivesSection />
+        <SectionErrorBoundary label="Current Deals">
+          <IncentivesSection />
+        </SectionErrorBoundary>
       </div>
 
       {/* Integrations — webhook key, own API */}
       <div className="mt-8">
-        <IntegrationsSection />
+        <SectionErrorBoundary label="Integrations">
+          <IntegrationsSection />
+        </SectionErrorBoundary>
       </div>
 
       {/* Do Not Contact */}
       <div className="mt-8">
-        <DoNotContactSection />
+        <SectionErrorBoundary label="Do Not Contact">
+          <DoNotContactSection />
+        </SectionErrorBoundary>
       </div>
 
       {/* Monthly Report */}
       <div className="mt-8">
-        <MonthlyReportSection />
+        <SectionErrorBoundary label="Monthly Report">
+          <MonthlyReportSection />
+        </SectionErrorBoundary>
       </div>
 
       <style jsx>{`
@@ -286,10 +323,15 @@ function IncentivesSection() {
 
   async function loadIncentives() {
     setLoading(true)
-    const res = await fetch('/api/incentives')
-    const data = await res.json()
-    setIncentives(data)
-    setLoading(false)
+    try {
+      const res = await fetch('/api/incentives')
+      const data = await res.json()
+      setIncentives(Array.isArray(data) ? data : [])
+    } catch {
+      setIncentives([])
+    } finally {
+      setLoading(false)
+    }
   }
 
   async function handleAdd(e: React.FormEvent) {
@@ -770,10 +812,15 @@ function DoNotContactSection() {
 
   async function load() {
     setLoading(true)
-    const res = await fetch('/api/do-not-contact')
-    const data = await res.json()
-    setEntries(data)
-    setLoading(false)
+    try {
+      const res = await fetch('/api/do-not-contact')
+      const data = await res.json()
+      setEntries(Array.isArray(data) ? data : [])
+    } catch {
+      setEntries([])
+    } finally {
+      setLoading(false)
+    }
   }
 
   async function handleAdd(e: React.FormEvent) {
