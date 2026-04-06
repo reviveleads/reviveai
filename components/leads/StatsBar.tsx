@@ -6,18 +6,19 @@ interface Props {
 }
 
 const statItems = [
-  { key: 'total',            label: 'Total',           color: 'text-gray-900',   border: 'border-gray-200'  },
-  { key: 'pending',          label: 'Pending',         color: 'text-gray-600',   border: 'border-gray-200'  },
-  { key: 'contacted',        label: 'Contacted',       color: 'text-blue-600',   border: 'border-blue-100'  },
-  { key: 'responded',        label: 'Responded',       color: 'text-amber-600',  border: 'border-amber-100' },
-  { key: 'appointed',        label: 'Appointed',       color: 'text-green-600',  border: 'border-green-100' },
-  { key: 'opted_out',        label: 'Opted Out',       color: 'text-gray-400',   border: 'border-gray-100'  },
+  { key: 'total',            label: 'Total',            color: 'text-gray-900',   border: 'border-gray-200'   },
+  { key: 'pending',          label: 'Pending',          color: 'text-gray-600',   border: 'border-gray-200'   },
+  { key: 'abandoned',        label: 'Abandoned',        color: 'text-orange-600', border: 'border-orange-100' },
+  { key: 'contacted',        label: 'Contacted',        color: 'text-blue-600',   border: 'border-blue-100'   },
+  { key: 'responded',        label: 'Responded',        color: 'text-amber-600',  border: 'border-amber-100'  },
+  { key: 'appointed',        label: 'Appointed',        color: 'text-green-600',  border: 'border-green-100'  },
+  { key: 'opted_out',        label: 'Opted Out',        color: 'text-gray-400',   border: 'border-gray-100'   },
   { key: 'sequences_active', label: 'Sequences Active', color: 'text-purple-600', border: 'border-purple-100' },
 ] as const
 
 export default function StatsBar({ stats }: Props) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
       {statItems.map(item => (
         <div
           key={item.key}

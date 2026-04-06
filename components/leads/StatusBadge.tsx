@@ -22,6 +22,10 @@ const statusConfig: Record<LeadStatus, { label: string; classes: string }> = {
     label: 'Dead',
     classes: 'bg-red-50 text-red-600 ring-1 ring-red-200',
   },
+  abandoned: {
+    label: 'Abandoned',
+    classes: 'bg-orange-50 text-orange-700 ring-1 ring-orange-200',
+  },
   opted_out: {
     label: 'Opted Out',
     classes: 'bg-gray-100 text-gray-400 ring-1 ring-gray-200 line-through',

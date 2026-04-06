@@ -11,6 +11,7 @@ import { clsx } from 'clsx'
 const STATUS_FILTERS: { label: string; value: LeadStatus | 'all' }[] = [
   { label: 'All', value: 'all' },
   { label: 'Pending', value: 'pending' },
+  { label: 'Abandoned', value: 'abandoned' },
   { label: 'Contacted', value: 'contacted' },
   { label: 'Responded', value: 'responded' },
   { label: 'Appointed', value: 'appointed' },

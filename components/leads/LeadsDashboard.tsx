@@ -31,6 +31,7 @@ function recomputeStats(leads: Lead[], prevStats: LeadStats): LeadStats {
   return {
     total: leads.length,
     pending: leads.filter(l => l.status === 'pending').length,
+    abandoned: leads.filter(l => l.status === 'abandoned').length,
     contacted: leads.filter(l => l.status === 'contacted').length,
     responded: leads.filter(l => l.status === 'responded').length,
     appointed: leads.filter(l => l.status === 'appointed').length,
@@ -51,7 +52,8 @@ export default function LeadsDashboard({ initialLeads, stats: initialStats, init
   const [showConsentModal, setShowConsentModal] = useState(false)
   const [consentChecked, setConsentChecked] = useState(false)
 
-  const pendingCount = leads.filter(l => l.status === 'pending' && !l.opted_out).length
+  // Include abandoned leads in the campaign target count
+  const pendingCount = leads.filter(l => (l.status === 'pending' || l.status === 'abandoned') && !l.opted_out).length
 
   function handleLeadsAdded(newLeads: Lead[], skippedFresh = 0) {
     const updated = [...newLeads, ...leads]
@@ -80,12 +82,17 @@ export default function LeadsDashboard({ initialLeads, stats: initialStats, init
       })
 
       setLeads(prev =>
-        prev.map(l => (l.status === 'pending' && !l.opted_out) ? { ...l, status: 'contacted' as const } : l)
+        prev.map(l =>
+          (l.status === 'pending' || l.status === 'abandoned') && !l.opted_out
+            ? { ...l, status: 'contacted' as const }
+            : l
+        )
       )
       setStats(prev => ({
         ...prev,
         pending: 0,
-        contacted: prev.contacted + prev.pending,
+        abandoned: 0,
+        contacted: prev.contacted + prev.pending + prev.abandoned,
         sequences_active: data.sequences_active ?? prev.sequences_active,
       }))
 

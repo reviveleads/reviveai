@@ -1,4 +1,4 @@
-export type LeadStatus = 'pending' | 'contacted' | 'responded' | 'appointed' | 'dead' | 'opted_out'
+export type LeadStatus = 'pending' | 'contacted' | 'responded' | 'appointed' | 'dead' | 'abandoned' | 'opted_out'
 export type LeadIntent = 'model_loyal' | 'budget_driven'
 export type LeadTier = 'hot' | 'warm' | 'cold'
 
@@ -67,6 +67,7 @@ export interface LeadStats {
   responded: number
   appointed: number
   dead: number
+  abandoned: number
   opted_out: number
   sequences_active: number
 }

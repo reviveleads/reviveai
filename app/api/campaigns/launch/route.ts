@@ -21,10 +21,11 @@ export async function POST(_request: NextRequest) {
   const { data: leads, error: fetchError } = await supabase
     .from('leads').select('*')
     .eq('dealership_id', DEMO_DEALERSHIP_ID)
-    .eq('status', 'pending').eq('opted_out', false)
+    .in('status', ['pending', 'abandoned'])
+    .eq('opted_out', false)
 
   if (fetchError) return NextResponse.json({ error: fetchError.message }, { status: 500 })
-  if (!leads?.length) return NextResponse.json({ message: 'No pending leads to contact', total: 0, succeeded: 0, failed: 0, held: 0, skipped_fresh: 0 })
+  if (!leads?.length) return NextResponse.json({ message: 'No pending or abandoned leads to contact', total: 0, succeeded: 0, failed: 0, held: 0, skipped_fresh: 0 })
 
   if (!isWithinSendingHours()) {
     return NextResponse.json({

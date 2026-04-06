@@ -19,7 +19,7 @@ interface Props {
   onLeadUpdated: (lead: Lead) => void
 }
 
-const STATUS_OPTIONS: LeadStatus[] = ['pending', 'contacted', 'responded', 'appointed', 'dead']
+const STATUS_OPTIONS: LeadStatus[] = ['pending', 'abandoned', 'contacted', 'responded', 'appointed', 'dead']
 
 function formatPhone(p: string) {
   const d = p.replace(/\D/g, '')
