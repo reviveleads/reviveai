@@ -11,23 +11,29 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Name, dealership, and email are required.' }, { status: 400 })
     }
 
-    await resend.emails.send({
-      from: 'ReviveAI Demo Requests <onboarding@resend.dev>',
-      to: ['hello@reviveleads.net'],
-      subject: `Demo Request — ${dealership}`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto; padding: 32px;">
-          <h2 style="margin: 0 0 24px; font-size: 20px; color: #111;">New Demo Request</h2>
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr><td style="padding: 8px 0; color: #666; width: 140px;">Name</td><td style="padding: 8px 0; font-weight: 600;">${name}</td></tr>
-            <tr><td style="padding: 8px 0; color: #666;">Dealership</td><td style="padding: 8px 0; font-weight: 600;">${dealership}</td></tr>
-            <tr><td style="padding: 8px 0; color: #666;">Email</td><td style="padding: 8px 0;"><a href="mailto:${email}">${email}</a></td></tr>
-            <tr><td style="padding: 8px 0; color: #666;">Phone</td><td style="padding: 8px 0;">${phone || '—'}</td></tr>
-            <tr><td style="padding: 8px 0; color: #666;">Dormant leads</td><td style="padding: 8px 0;">${dormant_leads || '—'}</td></tr>
-          </table>
-        </div>
-      `,
-    })
+    await Promise.all([
+      // Notification to Joe
+      resend.emails.send({
+        from: 'Revive AI <onboarding@resend.dev>',
+        to: ['joe@reviveleads.net'],
+        subject: `New Demo Request — ${dealership}`,
+        text: [
+          `Name: ${name}`,
+          `Dealership: ${dealership}`,
+          `Phone: ${phone || '—'}`,
+          `Email: ${email}`,
+          dormant_leads ? `Dormant leads: ${dormant_leads}` : '',
+        ].filter(Boolean).join('\n'),
+      }),
+
+      // Confirmation to submitter
+      resend.emails.send({
+        from: 'Revive AI <onboarding@resend.dev>',
+        to: [email],
+        subject: 'We got your request — Revive AI',
+        text: `Hey ${name.split(' ')[0]}, got your info. I'll be in touch within 24 hours.\n\n- Joe, Revive AI | joe@reviveleads.net`,
+      }),
+    ])
 
     return NextResponse.json({ ok: true })
   } catch (err: any) {
