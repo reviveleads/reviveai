@@ -11,13 +11,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Name, dealership, and email are required.' }, { status: 400 })
     }
 
+    const firstName = name.split(' ')[0]
+
     await Promise.all([
       // Notification to Joe
       resend.emails.send({
-        from: 'Revive AI <onboarding@resend.dev>',
+        from: 'Revive AI <joe@reviveleads.net>',
         to: ['joe@reviveleads.net'],
         subject: `New Demo Request — ${dealership}`,
         text: [
+          `New demo request from ${name} at ${dealership}.`,
+          '',
           `Name: ${name}`,
           `Dealership: ${dealership}`,
           `Phone: ${phone || '—'}`,
@@ -28,10 +32,10 @@ export async function POST(req: NextRequest) {
 
       // Confirmation to submitter
       resend.emails.send({
-        from: 'Revive AI <onboarding@resend.dev>',
+        from: 'Joe at Revive AI <joe@reviveleads.net>',
         to: [email],
-        subject: 'We got your request — Revive AI',
-        text: `Hey ${name.split(' ')[0]}, got your info. I'll be in touch within 24 hours.\n\n- Joe, Revive AI | joe@reviveleads.net`,
+        subject: 'Got it — talk soon',
+        text: `Hey ${firstName},\n\nGot your request for ${dealership}. I'll reach out within 24 hours to set up a quick demo.\n\nIn the meantime you can check out the app at app.reviveleads.net.\n\n- Joe\nRevive AI\njoe@reviveleads.net\n(984) 254-7322`,
       }),
     ])
 
