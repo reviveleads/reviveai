@@ -192,7 +192,7 @@ export default function LandingPage() {
               },
             ].map(item => (
               <div key={item.step} className="relative">
-                <div className="mb-4 text-5xl font-black text-[#8B0000]/20 leading-none select-none">
+                <div className="mb-4 text-5xl font-black text-[#CC0000] leading-none select-none">
                   {item.step}
                 </div>
                 <h3 className="mb-2 text-lg font-semibold text-white">{item.title}</h3>
