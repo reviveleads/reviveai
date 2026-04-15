@@ -7,7 +7,7 @@ export async function GET() {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('dealership_settings')
-    .select('dealership_id, dealership_name, salesperson_name, salesperson_phone, brands_we_sell, webhook_api_key, avg_deal_value, avg_lead_cost, monthly_plan_cost, sales_manager_email, gm_email, additional_emails')
+    .select('*')
     .eq('dealership_id', DEMO_DEALERSHIP_ID)
     .single()
 
@@ -16,16 +16,7 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json(data ?? {
-    dealership_id: DEMO_DEALERSHIP_ID,
-    dealership_name: '',
-    salesperson_name: '',
-    salesperson_phone: '',
-    brands_we_sell: '',
-    sales_manager_email: null,
-    gm_email: null,
-    additional_emails: null,
-  })
+  return NextResponse.json(data ?? { dealership_id: DEMO_DEALERSHIP_ID })
 }
 
 export async function POST(request: NextRequest) {
@@ -38,21 +29,32 @@ export async function POST(request: NextRequest) {
     salesperson_name: body.salesperson_name ?? '',
     salesperson_phone: body.salesperson_phone ?? '',
     brands_we_sell: body.brands_we_sell ?? '',
-    // Keep salesperson_email in sync with sales_manager_email for any legacy references
+    // Keep salesperson_email in sync with sales_manager_email for legacy references
     salesperson_email: body.sales_manager_email || null,
+    sales_manager_email: body.sales_manager_email || null,
+    gm_email: body.gm_email || null,
+    additional_emails: body.additional_emails || null,
+    avg_deal_value: body.avg_deal_value !== undefined ? (Number(body.avg_deal_value) || 2500) : 2500,
+    avg_lead_cost: body.avg_lead_cost !== undefined ? (Number(body.avg_lead_cost) || 400) : 400,
+    monthly_plan_cost: body.monthly_plan_cost !== undefined ? (Number(body.monthly_plan_cost) || 1500) : 1500,
   }
-  if (body.avg_deal_value !== undefined) payload.avg_deal_value = Number(body.avg_deal_value) ?? 2500
-  if (body.avg_lead_cost !== undefined) payload.avg_lead_cost = Number(body.avg_lead_cost) ?? 400
-  if (body.monthly_plan_cost !== undefined) payload.monthly_plan_cost = Number(body.monthly_plan_cost) ?? 1500
-  payload.sales_manager_email = body.sales_manager_email || null
-  payload.gm_email = body.gm_email || null
-  payload.additional_emails = body.additional_emails || null
 
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from('dealership_settings')
     .upsert(payload, { onConflict: 'dealership_id' })
     .select()
     .single()
+
+  // If business metrics columns don't exist yet (migration pending), retry without them
+  if (error?.code === '42703') {
+    console.warn('[settings POST] column missing — retrying without business metrics:', error.message)
+    const { avg_deal_value, avg_lead_cost, monthly_plan_cost, ...basePayload } = payload as any
+    ;({ data, error } = await supabase
+      .from('dealership_settings')
+      .upsert(basePayload, { onConflict: 'dealership_id' })
+      .select()
+      .single())
+  }
 
   if (error) {
     console.error('[settings POST] error:', error.message, error.code)
