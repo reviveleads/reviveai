@@ -19,11 +19,17 @@ async function sendResponseNotification(
   try {
     const { data: settings } = await supabase
       .from('dealership_settings')
-      .select('salesperson_email, salesperson_name')
+      .select('salesperson_email, salesperson_name, sales_manager_email, additional_emails')
       .eq('dealership_id', DEMO_DEALERSHIP_ID)
       .single()
 
-    if (!settings?.salesperson_email) return
+    const primaryEmail = settings?.sales_manager_email || settings?.salesperson_email
+    if (!primaryEmail) return
+
+    const extraEmails = settings?.additional_emails
+      ? settings.additional_emails.split(',').map((e: string) => e.trim()).filter(Boolean)
+      : []
+    const recipients = Array.from(new Set([primaryEmail, ...extraEmails]))
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
     const convoUrl = `${appUrl}/conversations/${lead.id}`
@@ -31,7 +37,7 @@ async function sendResponseNotification(
     const vehicle = lead.vehicle_interest || 'their vehicle of interest'
 
     await sendEmail({
-      to: settings.salesperson_email,
+      to: recipients,
       subject: `🔥 ${leadName} just responded — act fast`,
       html: `<!DOCTYPE html>
 <html>

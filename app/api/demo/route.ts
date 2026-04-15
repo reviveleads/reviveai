@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
         from: 'Joe at Revive AI <joe@reviveleads.net>',
         to: [email],
         subject: 'Got it — talk soon',
-        text: `Hey ${firstName},\n\nGot your request for ${dealership}. I'll reach out within 24 hours to set up a quick demo.\n\nIn the meantime you can check out the app at app.reviveleads.net.\n\n- Joe\nRevive AI\njoe@reviveleads.net\n(984) 254-7322`,
+        text: `Hey ${firstName},\n\nGot your request for ${dealership}. I'll reach out within 24 hours to set up a quick demo. In the meantime you can check out the app at app.reviveleads.net.\n\n- Joe\nRevive AI\njoe@reviveleads.net\n(919) 480-6656`,
       }),
     ])
 

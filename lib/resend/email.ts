@@ -10,7 +10,7 @@ export async function sendEmail({
   html,
   text,
 }: {
-  to: string
+  to: string | string[]
   subject: string
   html: string
   text: string

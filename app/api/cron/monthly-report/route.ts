@@ -19,7 +19,7 @@ async function buildReportData(supabase: ReturnType<typeof createAdminClient>, r
   const [settingsRes, totalLeadsRes, inboundRes, apptRes, topConvsRes] = await Promise.all([
     supabase
       .from('dealership_settings')
-      .select('dealership_name, salesperson_name, salesperson_email, avg_deal_value, avg_lead_cost, monthly_plan_cost')
+      .select('dealership_name, salesperson_name, salesperson_email, sales_manager_email, gm_email, avg_deal_value, avg_lead_cost, monthly_plan_cost')
       .eq('dealership_id', DEMO_DEALERSHIP_ID)
       .single(),
     supabase
@@ -82,6 +82,7 @@ async function buildReportData(supabase: ReturnType<typeof createAdminClient>, r
     dealershipName: (settings as any).dealership_name || 'Your Dealership',
     salespersonName: (settings as any).salesperson_name || 'there',
     salespersonEmail: (settings as any).salesperson_email as string | null,
+    reportEmail: ((settings as any).gm_email || (settings as any).sales_manager_email || (settings as any).salesperson_email) as string | null,
     totalLeads: totalLeadsRes.count ?? 0,
     reactivated,
     appointments,
@@ -208,19 +209,19 @@ export async function POST(request: NextRequest) {
   const range = prevMonthRange()
   const data = await buildReportData(supabase, range)
 
-  if (!data.salespersonEmail) {
-    return NextResponse.json({ error: 'No salesperson_email configured in settings' }, { status: 400 })
+  if (!data.reportEmail) {
+    return NextResponse.json({ error: 'No notification email configured in settings' }, { status: 400 })
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://app.reviveai.com'
   const html = buildEmailHtml(data, range.label, appUrl)
 
   await sendEmail({
-    to: data.salespersonEmail,
+    to: data.reportEmail,
     subject: `Your Revive Results — ${range.label}`,
     html,
     text: `ReviveAI Monthly Report — ${range.label}\n\nLeads reactivated: ${data.reactivated}\nAppointments booked: ${data.appointments}\nEstimated revenue: $${data.estimatedRevenue.toLocaleString()}\nROI: ${data.roiMultiple}×\n\nView your dashboard: ${appUrl}`,
   })
 
-  return NextResponse.json({ sent: true, to: data.salespersonEmail, month: range.label })
+  return NextResponse.json({ sent: true, to: data.reportEmail, month: range.label })
 }

@@ -24,6 +24,7 @@ export default function DemoForm() {
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [phoneError, setPhoneError] = useState<string | null>(null)
 
   function set<K extends keyof FormState>(key: K, value: string) {
     setFields(prev => ({ ...prev, [key]: value }))
@@ -31,6 +32,11 @@ export default function DemoForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    const digits = fields.phone.replace(/\D/g, '')
+    if (digits.length !== 10) {
+      setPhoneError('Please enter a valid 10-digit phone number.')
+      return
+    }
     if (!fields.name || !fields.dealership || !fields.email) return
     setSubmitting(true)
     setError(null)
@@ -106,14 +112,16 @@ export default function DemoForm() {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wide">Phone</label>
+          <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wide">Phone *</label>
           <input
             type="tel"
             value={fields.phone}
-            onChange={e => set('phone', e.target.value)}
+            onChange={e => { set('phone', e.target.value); setPhoneError(null) }}
             placeholder="(555) 000-1234"
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-gray-600 focus:border-[#8B0000] focus:outline-none focus:ring-1 focus:ring-[#8B0000] transition-colors"
+            required
+            className={`w-full rounded-lg border bg-white/5 px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-1 transition-colors ${phoneError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-white/10 focus:border-[#8B0000] focus:ring-[#8B0000]'}`}
           />
+          {phoneError && <p className="mt-1.5 text-xs text-red-400">{phoneError}</p>}
         </div>
       </div>
       <div>
@@ -142,7 +150,7 @@ export default function DemoForm() {
 
       <button
         type="submit"
-        disabled={submitting || !fields.name || !fields.dealership || !fields.email}
+        disabled={submitting || !fields.name || !fields.dealership || !fields.email || !fields.phone}
         className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#8B0000] px-6 py-4 text-sm font-semibold text-white hover:bg-[#a00000] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {submitting ? (

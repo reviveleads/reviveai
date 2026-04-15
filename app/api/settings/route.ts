@@ -7,7 +7,7 @@ export async function GET() {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('dealership_settings')
-    .select('dealership_id, dealership_name, salesperson_name, salesperson_phone, salesperson_email, brands_we_sell, webhook_api_key, avg_deal_value, avg_lead_cost, monthly_plan_cost')
+    .select('dealership_id, dealership_name, salesperson_name, salesperson_phone, salesperson_email, brands_we_sell, webhook_api_key, avg_deal_value, avg_lead_cost, monthly_plan_cost, sales_manager_email, gm_email, additional_emails')
     .eq('dealership_id', DEMO_DEALERSHIP_ID)
     .single()
 
@@ -23,6 +23,9 @@ export async function GET() {
     salesperson_phone: '',
     salesperson_email: '',
     brands_we_sell: '',
+    sales_manager_email: null,
+    gm_email: null,
+    additional_emails: null,
   })
 }
 
@@ -41,6 +44,9 @@ export async function POST(request: NextRequest) {
   if (body.avg_deal_value !== undefined) payload.avg_deal_value = Number(body.avg_deal_value) || 2500
   if (body.avg_lead_cost !== undefined) payload.avg_lead_cost = Number(body.avg_lead_cost) || 400
   if (body.monthly_plan_cost !== undefined) payload.monthly_plan_cost = Number(body.monthly_plan_cost) || 1500
+  payload.sales_manager_email = body.sales_manager_email || null
+  payload.gm_email = body.gm_email || null
+  payload.additional_emails = body.additional_emails || null
 
   const { data, error } = await supabase
     .from('dealership_settings')

@@ -44,6 +44,9 @@ interface DealershipSettings {
   avg_deal_value: string
   avg_lead_cost: string
   monthly_plan_cost: string
+  sales_manager_email: string
+  gm_email: string
+  additional_emails: string
 }
 
 const DEFAULT: DealershipSettings = {
@@ -55,6 +58,9 @@ const DEFAULT: DealershipSettings = {
   avg_deal_value: '2500',
   avg_lead_cost: '400',
   monthly_plan_cost: '1500',
+  sales_manager_email: '',
+  gm_email: '',
+  additional_emails: '',
 }
 
 const ALL_BRANDS = [
@@ -86,6 +92,9 @@ export default function SettingsForm() {
           avg_deal_value: String(data.avg_deal_value ?? 2500),
           avg_lead_cost: String(data.avg_lead_cost ?? 400),
           monthly_plan_cost: String(data.monthly_plan_cost ?? 1500),
+          sales_manager_email: data.sales_manager_email ?? '',
+          gm_email: data.gm_email ?? '',
+          additional_emails: data.additional_emails ?? '',
         })
       })
       .catch(() => { /* network failure — keep defaults */ })
@@ -212,6 +221,25 @@ export default function SettingsForm() {
             </FormField>
             <FormField label="Email" hint="Used as reply-to for outbound emails" icon={<Mail className="h-4 w-4 text-gray-400" />}>
               <input type="email" value={fields.salesperson_email} onChange={e => set('salesperson_email', e.target.value)} placeholder="mike@yourdealership.com" className="field-input" />
+            </FormField>
+          </div>
+        </section>
+
+        {/* Notifications */}
+        <section className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
+            <Zap className="h-4 w-4 text-gray-500" />
+            <h2 className="text-sm font-semibold text-gray-700">Notifications</h2>
+          </div>
+          <div className="px-6 py-5 space-y-4">
+            <FormField label="Sales Manager Email *" hint="Receives instant hot lead alerts when a dead lead responds" icon={<Mail className="h-4 w-4 text-gray-400" />}>
+              <input type="email" value={fields.sales_manager_email} onChange={e => set('sales_manager_email', e.target.value)} placeholder="salesmanager@dealership.com" className="field-input" />
+            </FormField>
+            <FormField label="GM / Owner Email" hint="Receives the monthly ROI report. Falls back to Sales Manager Email if blank." icon={<Mail className="h-4 w-4 text-gray-400" />}>
+              <input type="email" value={fields.gm_email} onChange={e => set('gm_email', e.target.value)} placeholder="gm@dealership.com" className="field-input" />
+            </FormField>
+            <FormField label="Additional Notification Emails" hint="Up to 3 extra emails that also receive hot lead alerts, comma-separated" icon={<Mail className="h-4 w-4 text-gray-400" />}>
+              <input type="text" value={fields.additional_emails} onChange={e => set('additional_emails', e.target.value)} placeholder="email1@dealer.com, email2@dealer.com" className="field-input" />
             </FormField>
           </div>
         </section>
