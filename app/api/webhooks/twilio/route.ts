@@ -19,12 +19,12 @@ async function sendResponseNotification(
   try {
     const { data: settings } = await supabase
       .from('dealership_settings')
-      .select('salesperson_email, salesperson_name, sales_manager_email, additional_emails')
+      .select('salesperson_name, sales_manager_email, additional_emails')
       .eq('dealership_id', DEMO_DEALERSHIP_ID)
       .single()
 
-    const primaryEmail = settings?.sales_manager_email || settings?.salesperson_email
-    if (!primaryEmail) return
+    if (!settings?.sales_manager_email) return
+    const primaryEmail = settings.sales_manager_email
 
     const extraEmails = settings?.additional_emails
       ? settings.additional_emails.split(',').map((e: string) => e.trim()).filter(Boolean)

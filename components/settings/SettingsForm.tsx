@@ -39,7 +39,6 @@ interface DealershipSettings {
   dealership_name: string
   salesperson_name: string
   salesperson_phone: string
-  salesperson_email: string
   brands_we_sell: string
   avg_deal_value: string
   avg_lead_cost: string
@@ -53,7 +52,6 @@ const DEFAULT: DealershipSettings = {
   dealership_name: '',
   salesperson_name: '',
   salesperson_phone: '',
-  salesperson_email: '',
   brands_we_sell: '',
   avg_deal_value: '2500',
   avg_lead_cost: '400',
@@ -87,7 +85,6 @@ export default function SettingsForm() {
           dealership_name: data.dealership_name ?? '',
           salesperson_name: data.salesperson_name ?? '',
           salesperson_phone: data.salesperson_phone ?? '',
-          salesperson_email: data.salesperson_email ?? '',
           brands_we_sell: data.brands_we_sell ?? '',
           avg_deal_value: String(data.avg_deal_value ?? 2500),
           avg_lead_cost: String(data.avg_lead_cost ?? 400),
@@ -218,9 +215,6 @@ export default function SettingsForm() {
             </FormField>
             <FormField label="Phone" hint="Shown in follow-up context; not used for sending" icon={<Phone className="h-4 w-4 text-gray-400" />}>
               <input type="tel" value={fields.salesperson_phone} onChange={e => set('salesperson_phone', e.target.value)} placeholder="e.g. (555) 000-1234" className="field-input" />
-            </FormField>
-            <FormField label="Email" hint="Used as reply-to for outbound emails" icon={<Mail className="h-4 w-4 text-gray-400" />}>
-              <input type="email" value={fields.salesperson_email} onChange={e => set('salesperson_email', e.target.value)} placeholder="mike@yourdealership.com" className="field-input" />
             </FormField>
           </div>
         </section>

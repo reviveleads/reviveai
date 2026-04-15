@@ -19,7 +19,7 @@ async function buildReportData(supabase: ReturnType<typeof createAdminClient>, r
   const [settingsRes, totalLeadsRes, inboundRes, apptRes, topConvsRes] = await Promise.all([
     supabase
       .from('dealership_settings')
-      .select('dealership_name, salesperson_name, salesperson_email, sales_manager_email, gm_email, avg_deal_value, avg_lead_cost, monthly_plan_cost')
+      .select('dealership_name, salesperson_name, sales_manager_email, gm_email, avg_deal_value, avg_lead_cost, monthly_plan_cost')
       .eq('dealership_id', DEMO_DEALERSHIP_ID)
       .single(),
     supabase
@@ -81,8 +81,7 @@ async function buildReportData(supabase: ReturnType<typeof createAdminClient>, r
   return {
     dealershipName: (settings as any).dealership_name || 'Your Dealership',
     salespersonName: (settings as any).salesperson_name || 'there',
-    salespersonEmail: (settings as any).salesperson_email as string | null,
-    reportEmail: ((settings as any).gm_email || (settings as any).sales_manager_email || (settings as any).salesperson_email) as string | null,
+    reportEmail: ((settings as any).gm_email || (settings as any).sales_manager_email) as string | null,
     totalLeads: totalLeadsRes.count ?? 0,
     reactivated,
     appointments,
