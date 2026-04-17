@@ -251,7 +251,7 @@ export default function LeadsDashboard({ initialLeads, stats: initialStats, init
               />
               <span className="text-sm text-gray-700 leading-relaxed">
                 I confirm that all leads in this campaign provided <strong>express written consent</strong> to
-                be contacted by my dealership via SMS and email, as required by the TCPA.
+                be contacted by my dealership via SMS, as required by the TCPA.
               </span>
             </label>
 

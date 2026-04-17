@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
-import { generateFirstTouchSMS, generateFollowUpEmail } from '@/lib/ai/conversation'
+import { generateFirstTouchSMS } from '@/lib/ai/conversation'
 import { sendSMS } from '@/lib/twilio/sms'
-import { sendEmail } from '@/lib/resend/email'
 import { Lead } from '@/types'
 import { addSMSFooter } from '@/lib/compliance/optOut'
 import { isWithinSendingHours, nextSendWindowISO } from '@/lib/compliance/quietHours'
@@ -91,7 +90,7 @@ export async function POST(_request: NextRequest) {
         ignoreDuplicates: true,
       })
 
-      // Cold leads: skip immediate send — cron handles touch 1 (email)
+      // Cold leads: skip immediate send — cron handles touch 1 (SMS)
       if (tier === 'cold') {
         await supabase.from('leads').update({ status: 'contacted' }).eq('id', lead.id)
         results.push({ id: lead.id, success: true, tier })

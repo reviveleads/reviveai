@@ -8,41 +8,40 @@ interface TouchDef {
 
 // Hot: recently went dead (30–90 days) — aggressive, 13 touches over 180 days
 const HOT_SEQUENCE: TouchDef[] = [
-  { touch_number: 1,  day_offset: 0,   channel: 'sms'   }, // Sent immediately on launch
-  { touch_number: 2,  day_offset: 3,   channel: 'sms'   },
-  { touch_number: 3,  day_offset: 5,   channel: 'sms'   },
-  { touch_number: 4,  day_offset: 8,   channel: 'email' },
-  { touch_number: 5,  day_offset: 11,  channel: 'sms'   },
-  { touch_number: 6,  day_offset: 16,  channel: 'email' },
-  { touch_number: 7,  day_offset: 22,  channel: 'sms'   },
-  { touch_number: 8,  day_offset: 28,  channel: 'sms'   },
-  { touch_number: 9,  day_offset: 45,  channel: 'email' },
-  { touch_number: 10, day_offset: 60,  channel: 'sms'   },
-  { touch_number: 11, day_offset: 90,  channel: 'email' },
-  { touch_number: 12, day_offset: 120, channel: 'sms'   },
-  { touch_number: 13, day_offset: 180, channel: 'email' },
+  { touch_number: 1,  day_offset: 0,   channel: 'sms' }, // Sent immediately on launch
+  { touch_number: 2,  day_offset: 3,   channel: 'sms' },
+  { touch_number: 3,  day_offset: 5,   channel: 'sms' },
+  { touch_number: 4,  day_offset: 8,   channel: 'sms' },
+  { touch_number: 5,  day_offset: 11,  channel: 'sms' },
+  { touch_number: 6,  day_offset: 16,  channel: 'sms' },
+  { touch_number: 7,  day_offset: 22,  channel: 'sms' },
+  { touch_number: 8,  day_offset: 28,  channel: 'sms' },
+  { touch_number: 9,  day_offset: 45,  channel: 'sms' },
+  { touch_number: 10, day_offset: 60,  channel: 'sms' },
+  { touch_number: 11, day_offset: 90,  channel: 'sms' },
+  { touch_number: 12, day_offset: 120, channel: 'sms' },
+  { touch_number: 13, day_offset: 180, channel: 'sms' },
 ]
 
 // Warm: went dark 91 days–1 year — medium cadence, 7 touches over 180 days
 const WARM_SEQUENCE: TouchDef[] = [
-  { touch_number: 1, day_offset: 0,   channel: 'sms'   }, // Sent immediately on launch
-  { touch_number: 2, day_offset: 7,   channel: 'email' },
-  { touch_number: 3, day_offset: 21,  channel: 'sms'   },
-  { touch_number: 4, day_offset: 45,  channel: 'email' },
-  { touch_number: 5, day_offset: 75,  channel: 'sms'   },
-  { touch_number: 6, day_offset: 105, channel: 'email' },
-  { touch_number: 7, day_offset: 180, channel: 'sms'   },
+  { touch_number: 1, day_offset: 0,   channel: 'sms' }, // Sent immediately on launch
+  { touch_number: 2, day_offset: 7,   channel: 'sms' },
+  { touch_number: 3, day_offset: 21,  channel: 'sms' },
+  { touch_number: 4, day_offset: 45,  channel: 'sms' },
+  { touch_number: 5, day_offset: 75,  channel: 'sms' },
+  { touch_number: 6, day_offset: 105, channel: 'sms' },
+  { touch_number: 7, day_offset: 180, channel: 'sms' },
 ]
 
-// Cold: 1+ year gone — relationship play, 6 touches over 365 days
-// Touch 1 is email (not immediate SMS blast) — queued for cron
+// Cold: 1+ year gone — relationship play, 6 touches over 365 days, queued for cron
 const COLD_SEQUENCE: TouchDef[] = [
-  { touch_number: 1, day_offset: 0,   channel: 'email' },
-  { touch_number: 2, day_offset: 30,  channel: 'sms'   },
-  { touch_number: 3, day_offset: 90,  channel: 'email' },
-  { touch_number: 4, day_offset: 180, channel: 'sms'   },
-  { touch_number: 5, day_offset: 270, channel: 'email' },
-  { touch_number: 6, day_offset: 365, channel: 'sms'   },
+  { touch_number: 1, day_offset: 0,   channel: 'sms' },
+  { touch_number: 2, day_offset: 30,  channel: 'sms' },
+  { touch_number: 3, day_offset: 90,  channel: 'sms' },
+  { touch_number: 4, day_offset: 180, channel: 'sms' },
+  { touch_number: 5, day_offset: 270, channel: 'sms' },
+  { touch_number: 6, day_offset: 365, channel: 'sms' },
 ]
 
 const SEQUENCES: Record<LeadTier, TouchDef[]> = {
@@ -63,7 +62,7 @@ export interface SequenceRecord {
 /**
  * Build all sequence records for a lead.
  * - Hot/warm: touch 1 is sent immediately by campaign launch, so mark it 'sent'
- * - Cold: all touches are pending (cron handles touch 1 as email)
+ * - Cold: all touches are pending (cron handles touch 1)
  */
 export function buildSequence(
   leadId: string,

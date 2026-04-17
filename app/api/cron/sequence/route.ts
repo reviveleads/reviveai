@@ -120,11 +120,14 @@ export async function POST(request: NextRequest) {
         continue
       }
 
-      // Email touch with no email address — skip this touch, keep sequence running
-      if (touch.channel === 'email' && !lead.email) {
-        await skipTouch(supabase, touch.id, 'No email address on file')
-        skipped++
-        continue
+      // No phone — fall back to email if available, otherwise skip this touch
+      if (!lead.phone) {
+        if (!lead.email) {
+          await skipTouch(supabase, touch.id, 'No phone or email on file')
+          skipped++
+          continue
+        }
+        // Has email but no phone — send email fallback below
       }
 
       const vehicle = lead.vehicle_interest ?? 'the vehicle you were interested in'
@@ -162,22 +165,11 @@ export async function POST(request: NextRequest) {
         created_at: lead.created_at,
       }
 
-      if (touch.channel === 'sms') {
-        const message = await generateFirstTouchSMS(
-          lead.first_name, vehicle, salespersonName, null, leadContext, enhancedContext
-        )
+      // SMS is the primary channel for all sequence touches.
+      // Email is only used as a fallback when the lead has no phone number.
+      const useEmailFallback = !lead.phone && !!lead.email
 
-        await supabase.from('conversations').insert({
-          lead_id: lead.id, channel: 'sms', direction: 'outbound', message,
-        })
-
-        try {
-          await sendSMS(lead.phone, addSMSFooter(message))
-        } catch (smsErr: any) {
-          console.error(`[sequence] SMS failed for ${lead.id}:`, smsErr.message)
-        }
-
-      } else {
+      if (useEmailFallback) {
         const { subject, html, text } = await generateFollowUpEmail(
           lead.first_name, vehicle, lead.id, salespersonName, dealershipName,
           null, leadContext, enhancedContext
@@ -190,7 +182,21 @@ export async function POST(request: NextRequest) {
         try {
           await sendEmail({ to: lead.email!, subject, html, text })
         } catch (emailErr: any) {
-          console.error(`[sequence] Email failed for ${lead.id}:`, emailErr.message)
+          console.error(`[sequence] Email fallback failed for ${lead.id}:`, emailErr.message)
+        }
+      } else {
+        const message = await generateFirstTouchSMS(
+          lead.first_name, vehicle, salespersonName, null, leadContext, enhancedContext
+        )
+
+        await supabase.from('conversations').insert({
+          lead_id: lead.id, channel: 'sms', direction: 'outbound', message,
+        })
+
+        try {
+          await sendSMS(lead.phone, addSMSFooter(message))
+        } catch (smsErr: any) {
+          console.error(`[sequence] SMS failed for ${lead.id}:`, smsErr.message)
         }
       }
 

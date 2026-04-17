@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import {
-  Zap, MessageSquare, Mail, Shield, TrendingUp,
+  Zap, MessageSquare, Shield, TrendingUp,
   ArrowRight, CheckCircle, ChevronDown, Car, BarChart2, Clock,
 } from 'lucide-react'
 import DemoForm from '@/components/landing/DemoForm'
@@ -68,7 +68,7 @@ export default function LandingPage() {
 
           {/* Subheadline */}
           <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-gray-400 sm:text-xl">
-            Revive reactivates dormant dealership leads with AI-powered SMS and email follow-up
+            Revive reactivates dormant dealership leads with AI-powered SMS follow-up
             that sounds completely human. No exclamation points. No generic blasts.
             Just conversations that convert.
           </p>
@@ -102,7 +102,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
             {[
               { value: '5-touch', label: 'AI sequence per lead' },
-              { value: 'SMS + Email', label: 'Multi-channel outreach' },
+              { value: 'SMS-first', label: 'Primary outreach channel' },
               { value: '0', label: 'Exclamation points. Ever.' },
               { value: 'TCPA', label: 'Compliant by default' },
             ].map(stat => (
@@ -234,7 +234,7 @@ export default function LandingPage() {
                 {
                   icon: <Clock className="h-5 w-5 text-[#8B0000]" />,
                   title: 'Multi-touch sequences',
-                  body: 'Up to 5 touchpoints per lead, spaced intelligently across SMS and email.',
+                  body: 'Up to 13 touchpoints per lead, spaced intelligently over 180 days via SMS.',
                 },
                 {
                   icon: <Shield className="h-5 w-5 text-[#8B0000]" />,
@@ -242,9 +242,9 @@ export default function LandingPage() {
                   body: 'Quiet hours enforcement, opt-out handling, and 18-month consent window tracking built in.',
                 },
                 {
-                  icon: <Mail className="h-5 w-5 text-[#8B0000]" />,
-                  title: 'SMS and email',
-                  body: 'Reaches leads where they actually respond — not just wherever your CRM defaults to.',
+                  icon: <MessageSquare className="h-5 w-5 text-[#8B0000]" />,
+                  title: 'SMS-first outreach',
+                  body: 'Reaches leads where they actually respond. Email used only as fallback for leads without a phone number.',
                 },
                 {
                   icon: <TrendingUp className="h-5 w-5 text-[#8B0000]" />,
