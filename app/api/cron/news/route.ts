@@ -10,14 +10,9 @@ function isAuthorized(request: NextRequest): boolean {
   return request.headers.get('authorization') === `Bearer ${secret}`
 }
 
-export async function POST(request: NextRequest) {
-  if (!isAuthorized(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
+async function runScrape() {
   const supabase = createAdminClient()
 
-  // Get dealership's active brands
   const { data: settings } = await supabase
     .from('dealership_settings')
     .select('brands_we_sell')
@@ -29,16 +24,15 @@ export async function POST(request: NextRequest) {
     : []
 
   if (brandsWeSell.length === 0) {
-    return NextResponse.json({ message: 'No brands configured — set brands in Settings first', inserted: 0 })
+    return { message: 'No brands configured', inserted: 0 }
   }
 
   const articles = await scrapeAllFeeds(brandsWeSell)
 
   if (articles.length === 0) {
-    return NextResponse.json({ message: 'No relevant articles found', inserted: 0 })
+    return { message: 'No relevant articles found', inserted: 0 }
   }
 
-  // Upsert articles, skip duplicates by URL
   const rows = articles.map(a => ({
     dealership_id: DEMO_DEALERSHIP_ID,
     headline: a.headline,
@@ -51,7 +45,6 @@ export async function POST(request: NextRequest) {
     article_type: a.article_type,
   }))
 
-  // Insert in batches of 50 to stay within limits
   let inserted = 0
   for (let i = 0; i < rows.length; i += 50) {
     const batch = rows.slice(i, i + 50)
@@ -62,30 +55,28 @@ export async function POST(request: NextRequest) {
     else console.error('[cron/news] upsert error:', error.message)
   }
 
-  // Delete articles older than 30 days
   await supabase
     .from('vehicle_news')
     .delete()
     .lt('published_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
 
-  return NextResponse.json({
-    scraped: articles.length,
-    inserted,
-    brands: brandsWeSell,
-  })
+  return { scraped: articles.length, inserted, brands: brandsWeSell }
 }
 
-// GET — return recent news grouped by brand
-export async function GET() {
-  const supabase = createAdminClient()
+// GET — called by Vercel cron daily
+export async function GET(request: NextRequest) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const result = await runScrape()
+  return NextResponse.json(result)
+}
 
-  const { data, error } = await supabase
-    .from('vehicle_news')
-    .select('*')
-    .eq('dealership_id', DEMO_DEALERSHIP_ID)
-    .order('published_at', { ascending: false })
-    .limit(50)
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json(data ?? [])
+// POST — manual trigger from dashboard
+export async function POST(request: NextRequest) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const result = await runScrape()
+  return NextResponse.json(result)
 }
