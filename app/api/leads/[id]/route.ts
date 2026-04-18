@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 
+async function safeQuery(promise: Promise<{ data: any[] | null; error: any }>) {
+  try {
+    const { data } = await promise
+    return data ?? []
+  } catch {
+    return []
+  }
+}
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: { id: string } }
@@ -18,9 +27,9 @@ export async function GET(
   }
 
   const [conversations, appointments, sequences] = await Promise.all([
-    supabase.from('conversations').select('*').eq('lead_id', params.id).order('sent_at', { ascending: true }).then(r => r.data ?? []).catch(() => []),
-    supabase.from('appointments').select('*').eq('lead_id', params.id).order('scheduled_at', { ascending: true }).then(r => r.data ?? []).catch(() => []),
-    supabase.from('campaign_sequences').select('*').eq('lead_id', params.id).order('touch_number', { ascending: true }).then(r => r.data ?? []).catch(() => []),
+    safeQuery(supabase.from('conversations').select('*').eq('lead_id', params.id).order('sent_at', { ascending: true })),
+    safeQuery(supabase.from('appointments').select('*').eq('lead_id', params.id).order('scheduled_at', { ascending: true })),
+    safeQuery(supabase.from('campaign_sequences').select('*').eq('lead_id', params.id).order('touch_number', { ascending: true })),
   ])
 
   return NextResponse.json({ lead, conversations, appointments, sequences })
@@ -51,5 +60,4 @@ export async function PATCH(
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json(data)
-}
+  return NextRespon
