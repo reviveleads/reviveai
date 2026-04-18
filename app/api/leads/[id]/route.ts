@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 
-async function safeQuery(promise: Promise<{ data: any[] | null; error: any }>) {
+async function safeQuery(promise: Promiselike<{ data: any[] | null; error: any }>) {
   try {
     const { data } = await promise
     return data ?? []
