@@ -63,16 +63,21 @@ async function runScrape() {
   return { scraped: articles.length, inserted, brands: brandsWeSell }
 }
 
-// GET — called by Vercel cron daily
-export async function GET(request: NextRequest) {
-  if (!isAuthorized(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-  const result = await runScrape()
-  return NextResponse.json(result)
+// GET — just return cached articles from DB, no scraping
+export async function GET() {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('vehicle_news')
+    .select('*')
+    .eq('dealership_id', DEMO_DEALERSHIP_ID)
+    .order('published_at', { ascending: false })
+    .limit(50)
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json(data ?? [])
 }
 
-// POST — manual trigger from dashboard
+// POST — scrape fresh articles (called by cron and manual refresh)
 export async function POST(request: NextRequest) {
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
