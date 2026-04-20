@@ -1,22 +1,46 @@
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  const isLoginPage = request.nextUrl.pathname.startsWith('/login')
-  
-  // Check for any Supabase auth cookie
-  const hasCookie = Array.from(request.cookies.getAll()).some(
-    cookie => cookie.name.includes('supabase') || cookie.name.includes('sb-')
+  let response = NextResponse.next({
+    request: { headers: request.headers },
+  })
+
+  const supabase = createServerClient(
+    'https://plxyxexgtopmwbcvotit.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBseHl4ZXhndG9wbXdiY3ZvdGl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjUxMDUsImV4cCI6MjA4OTYwMTEwNX0.FQ1Fq2Oa25Ewa4rXTVx5Gxhzg3f72Z9Lwm0bJ_qRDF4',
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          )
+          response = NextResponse.next({
+            request,
+          })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
   )
 
-  if (!hasCookie && !isLoginPage) {
+  const { data: { session } } = await supabase.auth.getSession()
+  const isLoginPage = request.nextUrl.pathname.startsWith('/login')
+
+  if (!session && !isLoginPage) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  if (hasCookie && isLoginPage) {
+  if (session && isLoginPage) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  return NextResponse.next()
+  return response
 }
 
 export const config = {
