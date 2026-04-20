@@ -1,20 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 import { useRouter } from 'next/navigation'
 
-const supabase = createClient(
+const supabase = createBrowserClient(
   'https://plxyxexgtopmwbcvotit.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBseHl4ZXhndG9wbXdiY3ZvdGl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjUxMDUsImV4cCI6MjA4OTYwMTEwNX0.FQ1Fq2Oa25Ewa4rXTVx5Gxhzg3f72Z9Lwm0bJ_qRDF4',
-  {
-    auth: {
-      storage: undefined,
-      persistSession: true,
-      storageKey: 'sb-session',
-      detectSessionInUrl: false,
-    }
-  }
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBseHl4ZXhndG9wbXdiY3ZvdGl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjUxMDUsImV4cCI6MjA4OTYwMTEwNX0.FQ1Fq2Oa25Ewa4rXTVx5Gxhzg3f72Z9Lwm0bJ_qRDF4'
 )
 
 export default function LoginPage() {
