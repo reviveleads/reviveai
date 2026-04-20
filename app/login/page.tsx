@@ -5,8 +5,8 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  'https://plxyxexgtopmwbcvotit.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBseHl4ZXhndG9wbXdiY3ZvdGl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjUxMDUsImV4cCI6MjA4OTYwMTEwNX0.FQ1Fq2Oa25Ewa4rXTVx5Gxhzg3f72Z9Lwm0bJ_qRDF4'
 )
 
 export default function LoginPage() {
