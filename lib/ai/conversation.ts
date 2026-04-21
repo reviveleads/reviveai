@@ -5,6 +5,27 @@ import { AIMessageContext } from '@/lib/intel/vehicleSearch'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
+export type TriggerType =
+  | 'dead_inquiry'
+  | 'previous_buyer_checkin'
+  | 'trade_in_window'
+  | 'mileage_milestone'
+  | 'orphan_customer'
+  | 'recall'
+  | 'model_redesign'
+  | 'lease_end'
+  | 'price_drop'
+  | 'rate_drop'
+  | 'new_inventory'
+  | 'out_of_area'
+  | 'end_of_month'
+  | 'tax_season'
+  | 'birthday'
+  | 'post_service'
+  | 'performance_upgrade'
+  | 'safety_feature'
+  | 'competitive_conquest'
+
 const SYSTEM_PROMPT = `You are [salesperson name], a real car salesperson texting a customer from your personal cell phone. This is not a marketing message. This is not automated. You remembered this customer and decided to text them yourself.
 
 You are a real person. Act like it.
@@ -22,37 +43,65 @@ HOW TO WRITE:
 NEVER DO ANY OF THESE:
 - No exclamation points. Not one. Not ever.
 - No emojis unless the customer used one first.
-- Never say: "I wanted to reach out", "just checking in", "hope this finds you well", "don't hesitate", "excited to offer", "great news", "amazing deal", "limited time", "act now", "as per", "touch base", "circle back", "following up", "feel free to", "valued customer", "our team", "moving forward", "at your earliest convenience"
+- Never say: "I wanted to reach out", "just checking in", "hope this finds you well", "don't hesitate", "excited to offer", "great news", "amazing deal", "limited time", "act now", "as per", "touch base", "circle back", "following up", "feel free to", "valued customer", "our team", "moving forward", "at your earliest convenience", "on the fence", "on your radar"
 - Never mention AI, automation, bots, or software.
-- Never fabricate urgency, deals, or promotions that aren't real. If you don't have a real incentive to reference, don't invent one.
-- Never use a seasonal hook unless the background context confirms it's currently relevant based on today's date.
+- Never fabricate urgency, deals, or promotions that aren't real.
 - Never sound like a mass text or a company communication. This is person-to-person.
 
+TONE BY TOUCH NUMBER:
+- Touch 1: Direct opener, specific to their situation, no pitch. Just a real question or relevant info.
+- Touch 2-3: Still light, maybe a new angle. Not desperate.
+- Touch 4-6: Longer gap since last touch, acknowledge it naturally. New hook if possible.
+- Touch 7+: Long time has passed. Almost like reconnecting. Very casual, zero pressure.
+
 TONE BY SITUATION:
-- No response yet: curious and low-key, never desperate. One shot, not a follow-up barrage.
-- They respond positively: match their energy, move naturally toward next step.
+- No response yet: curious and low-key, never desperate.
+- They respond positively: match their energy, move toward next step naturally.
 - They're hesitant: be human first. No pitch. Just acknowledge it.
 - They say not interested: respect it, leave the door open, one gracious exit. Done.
-- They ask something specific: answer like a knowledgeable friend. Direct and honest.
+- They ask something specific: answer like a knowledgeable friend. Direct and honest.`
 
-EXAMPLES:
-Good first touch: "Hey Sarah, saw you were looking at the Silverado LTZ a few months back. Still thinking about it?"
-Good first touch with hook: "Hey Mike, that Sierra you were looking at has $4,500 cash back right now. Worth knowing if you're still on the fence."
-Good follow-up: "Yeah the LTZ is a solid truck. You still in the same spot on budget or has anything changed?"
-Good news share: "Hey David, saw this dropped today on the '26 F-150 — big refresh from what you were looking at. [url] Figured you'd want to see it."
-Bad: "Hi Sarah! I wanted to reach out because we have some amazing deals on the Silverado LTZ that I think you'll love!"
-Bad: "Just following up on your recent inquiry. We have great deals this month. Don't hesitate to reach out!"
-Bad: "That's great to hear! I'd be happy to help you find the perfect financing option that meets your needs!"`
+const TRIGGER_CONTEXT: Record<TriggerType, string> = {
+  dead_inquiry: 'This customer inquired about a vehicle but never purchased. Reference what they were looking at and how long ago.',
+  previous_buyer_checkin: 'This customer bought from the dealership. This is a relationship check-in. No pitch. Just genuine.',
+  trade_in_window: 'This customer has owned their vehicle long enough that trade-in values are strong. Lead with the trade angle — what they could get for it right now.',
+  mileage_milestone: 'This customer is hitting a significant mileage milestone on their current vehicle. Frame around the right time to trade before value drops further.',
+  orphan_customer: 'The previous salesperson left the dealership. This is a warm handoff. Acknowledge the rep left, introduce yourself, keep it brief.',
+  recall: 'There is an active recall on their vehicle. This is a service call not a sales call — but make it easy for them to come in.',
+  model_redesign: 'The vehicle they own or inquired about just got a major redesign. Lead with what changed, make them curious.',
+  lease_end: 'Their lease is ending soon. Get ahead of it. Give them options without pressure.',
+  price_drop: 'There is a real price drop or incentive on the vehicle they were looking at. Lead with the specific deal.',
+  rate_drop: 'Interest rates just dropped. Frame around payment being lower than they probably think right now.',
+  new_inventory: 'The specific vehicle they wanted just came in. Give them first shot.',
+  out_of_area: 'This customer is not local but inquired. Acknowledge the distance, make it worth the trip.',
+  end_of_month: 'End of month — dealer needs to hit numbers. Real urgency, not manufactured.',
+  tax_season: 'Tax refund season. Frame around down payment or monthly payment opportunity.',
+  birthday: 'Their birthday. Keep it personal and light. No hard pitch.',
+  post_service: 'They just came in for service. Warm moment to bring up trade or upgrade naturally.',
+  performance_upgrade: 'A performance upgrade or new engine option just dropped on their vehicle of interest.',
+  safety_feature: 'A new safety feature is available on the vehicle. Relevant if they have a family.',
+  competitive_conquest: 'They drive a competing brand. Lead with curiosity, not a hard sell against their current vehicle.',
+}
 
 export async function generateFirstTouchSMS(
   firstName: string,
   vehicleInterest: string,
   salespersonName = 'Jake',
   vehicleIntel?: string | null,
-  lead?: { trade_in_make?: string | null; trade_in_model?: string | null; trade_in_year?: number | null; trade_in_mileage?: number | null; budget_notes?: string | null; created_at?: string },
-  aiContext?: AIMessageContext
+  lead?: {
+    trade_in_make?: string | null
+    trade_in_model?: string | null
+    trade_in_year?: number | null
+    trade_in_mileage?: number | null
+    budget_notes?: string | null
+    created_at?: string
+  },
+  aiContext?: AIMessageContext,
+  touchNumber = 1,
+  triggerType: TriggerType = 'dead_inquiry'
 ): Promise<string> {
   const contextBlock = aiContext?.contextBlock ?? buildFallbackContext(firstName, vehicleInterest, salespersonName, vehicleIntel, lead)
+  const triggerContext = TRIGGER_CONTEXT[triggerType]
 
   const response = await client.messages.create({
     model: 'claude-sonnet-4-6',
@@ -60,7 +109,7 @@ export async function generateFirstTouchSMS(
     system: SYSTEM_PROMPT,
     messages: [{
       role: 'user',
-      content: `BACKGROUND CONTEXT (use 1-2 signals, never all):\n${contextBlock}\n\nWrite the first ever text from ${salespersonName} to ${firstName}.\n\nRequirements:\n- 2-3 sentences max. Hard limit.\n- Under 160 characters including sign-off.\n- Sign as "- ${salespersonName}"\n- No quotes around message. Just the text.`,
+      content: `BACKGROUND CONTEXT:\n${contextBlock}\n\nTRIGGER: ${triggerContext}\n\nTOUCH NUMBER: ${touchNumber} — adjust tone accordingly.\n\nWrite touch ${touchNumber} from ${salespersonName} to ${firstName}.\n\nRequirements:\n- 2 sentences max for touch 1. Slightly more natural for later touches.\n- Under 160 characters including sign-off.\n- Sign as "- ${salespersonName}"\n- No quotes. Just the text.`,
     }],
   })
 
@@ -74,7 +123,14 @@ export async function generateFollowUpEmail(
   salespersonName = 'Jake',
   dealershipName = 'the dealership',
   vehicleIntel?: string | null,
-  lead?: { trade_in_make?: string | null; trade_in_model?: string | null; trade_in_year?: number | null; trade_in_mileage?: number | null; budget_notes?: string | null; created_at?: string },
+  lead?: {
+    trade_in_make?: string | null
+    trade_in_model?: string | null
+    trade_in_year?: number | null
+    trade_in_mileage?: number | null
+    budget_notes?: string | null
+    created_at?: string
+  },
   aiContext?: AIMessageContext
 ): Promise<{ subject: string; html: string; text: string }> {
   const contextBlock = aiContext?.contextBlock ?? buildFallbackContext(firstName, vehicleInterest, salespersonName, vehicleIntel, lead)
@@ -85,7 +141,7 @@ export async function generateFollowUpEmail(
     system: SYSTEM_PROMPT,
     messages: [{
       role: 'user',
-      content: `BACKGROUND CONTEXT (use 1-2 signals naturally):\n${contextBlock}\n\nWrite a follow-up email from ${salespersonName} to ${firstName} who didn't respond to an initial text about the ${vehicleInterest}.\n\nFormat:\n- First line: "Subject: [subject]"\n- Blank line\n- Email body\n\nRequirements:\n- Subject: under 50 chars, punchy, real friend energy not marketing\n- Body: 2-3 short paragraphs, conversational, no formal language\n- Weave in 1-2 context signals naturally — don't list them\n- End with a real question or specific offer, not "feel free to contact us"\n- Sign as "${salespersonName} @ ${dealershipName}"`,
+      content: `BACKGROUND CONTEXT:\n${contextBlock}\n\nWrite a follow-up email from ${salespersonName} to ${firstName} about the ${vehicleInterest}.\n\nFormat:\n- First line: "Subject: [subject]"\n- Blank line\n- Email body\n\nRequirements:\n- Subject: under 50 chars, real and direct\n- Body: 2-3 short paragraphs, conversational\n- End with a real question, not "feel free to contact us"\n- Sign as "${salespersonName} @ ${dealershipName}"`,
     }],
   })
 
@@ -105,7 +161,14 @@ export async function generateConversationReply(
   inboundMessage: string,
   salespersonName = 'Jake',
   vehicleIntel?: string | null,
-  lead?: { trade_in_make?: string | null; trade_in_model?: string | null; trade_in_year?: number | null; trade_in_mileage?: number | null; budget_notes?: string | null; created_at?: string },
+  lead?: {
+    trade_in_make?: string | null
+    trade_in_model?: string | null
+    trade_in_year?: number | null
+    trade_in_mileage?: number | null
+    budget_notes?: string | null
+    created_at?: string
+  },
   aiContext?: AIMessageContext
 ): Promise<string> {
   const contextBlock = aiContext?.contextBlock ?? buildFallbackContext(firstName, vehicleInterest, salespersonName, vehicleIntel, lead)
@@ -126,14 +189,19 @@ export async function generateConversationReply(
   return (response.content[0].type === 'text' ? response.content[0].text : '').trim()
 }
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
 function buildFallbackContext(
   firstName: string,
   vehicleInterest: string,
   salespersonName: string,
   vehicleIntel?: string | null,
-  lead?: { trade_in_make?: string | null; trade_in_model?: string | null; trade_in_year?: number | null; trade_in_mileage?: number | null; budget_notes?: string | null; created_at?: string }
+  lead?: {
+    trade_in_make?: string | null
+    trade_in_model?: string | null
+    trade_in_year?: number | null
+    trade_in_mileage?: number | null
+    budget_notes?: string | null
+    created_at?: string
+  }
 ): string {
   const lines = [
     `Salesperson: ${salespersonName}`,
