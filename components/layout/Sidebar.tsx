@@ -14,8 +14,15 @@ import {
   TrendingUp,
   Menu,
   X,
+  LogOut,
 } from 'lucide-react'
 import { clsx } from 'clsx'
+import { createBrowserClient } from '@supabase/ssr'
+
+const supabase = createBrowserClient(
+  'https://plxyxexgtopmwbcvotit.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBseHl4ZXhndG9wbXdiY3ZvdGl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjUxMDUsImV4cCI6MjA4OTYwMTEwNX0.FQ1Fq2Oa25Ewa4rXTVx5Gxhzg3f72Z9Lwm0bJ_qRDF4'
+)
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -30,6 +37,11 @@ const navigation = [
 export default function Sidebar() {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  async function handleLogout() {
+    await supabase.auth.signOut()
+    window.location.href = 'https://app.reviveleads.net/login'
+  }
 
   const navLinks = (
     <nav className="flex-1 px-3 py-4 space-y-0.5">
@@ -83,7 +95,7 @@ export default function Sidebar() {
         onClick={() => setMobileOpen(false)}
       />
 
-      {/* Sidebar — fixed drawer on mobile, static column on desktop */}
+      {/* Sidebar */}
       <div
         className={clsx(
           'fixed top-0 bottom-0 left-0 z-50 flex w-64 flex-col bg-[#0f1117] transition-transform duration-300',
@@ -114,6 +126,13 @@ export default function Sidebar() {
         <div className="border-t border-[#1e2130] px-6 py-4">
           <p className="text-xs text-[#8b92a5]">ReviveAI v1.0</p>
           <p className="text-xs text-[#4a5068] mt-0.5">Contextual Intelligence</p>
+          <button
+            onClick={handleLogout}
+            className="mt-3 flex items-center gap-2 text-xs text-[#8b92a5] hover:text-red-400 transition-colors"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            Sign Out
+          </button>
         </div>
       </div>
     </>
