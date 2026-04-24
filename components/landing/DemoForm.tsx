@@ -148,6 +148,13 @@ export default function DemoForm() {
         </p>
       )}
 
+      <p className="text-xs text-gray-500 leading-relaxed">
+        By submitting this form, you agree to receive SMS messages from Revive AI LLC regarding your inquiry. Message and data rates may apply. Message frequency varies. Reply STOP to opt out. View our{' '}
+        <a href="/privacy" className="underline hover:text-gray-400 transition-colors">Privacy Policy</a>
+        {' '}and{' '}
+        <a href="/terms" className="underline hover:text-gray-400 transition-colors">Terms of Service</a>.
+      </p>
+
       <button
         type="submit"
         disabled={submitting || !fields.name || !fields.dealership || !fields.email || !fields.phone}

@@ -96,6 +96,9 @@ export default function PrivacyPage() {
                 <strong className="text-gray-300">For help:</strong> Reply <strong className="text-white">HELP</strong> or contact us at <a href="mailto:joe@reviveleads.net" className="text-[#cc2200] hover:underline">joe@reviveleads.net</a> or <a href="tel:+19194806656" className="text-[#cc2200] hover:underline">(919) 480-6656</a>.
               </li>
             </ul>
+            <p className="mt-4 text-gray-400">
+              Mobile opt-in data and consent will not be shared with or sold to third parties or affiliates for marketing or promotional purposes.
+            </p>
           </section>
 
           <section>
