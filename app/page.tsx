@@ -342,7 +342,8 @@ export default function LandingPage() {
       {/* ── Footer ────────────────────────────────────────────────────── */}
       <footer className="border-t border-white/5 bg-[#080808] py-12 px-4 sm:px-6">
         <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+          {/* Top row: brand + nav */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-8">
             <div className="flex items-center gap-2.5">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#8B0000]">
                 <Zap className="h-4 w-4 text-white" />
@@ -355,10 +356,37 @@ export default function LandingPage() {
             <div className="flex items-center gap-6 text-xs text-gray-600">
               <a href="#how-it-works" className="hover:text-gray-400 transition-colors">How it works</a>
               <a href="#demo" className="hover:text-gray-400 transition-colors">Request Demo</a>
+              <Link href="/privacy" className="hover:text-gray-400 transition-colors">Privacy Policy</Link>
+              <Link href="/terms" className="hover:text-gray-400 transition-colors">Terms</Link>
               <Link href="/dashboard" className="hover:text-gray-400 transition-colors">Sign In</Link>
             </div>
+          </div>
+
+          {/* Business info */}
+          <div className="border-t border-white/5 pt-6">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Business</p>
+                <p className="text-xs text-gray-400">Revive AI LLC</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Address</p>
+                <p className="text-xs text-gray-400">4030 Wake Forest Road, STE 349<br />Raleigh, NC 27609</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Phone</p>
+                <a href="tel:+19194806656" className="text-xs text-gray-400 hover:text-gray-300 transition-colors">(919) 480-6656</a>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Email</p>
+                <a href="mailto:joe@reviveleads.net" className="text-xs text-gray-400 hover:text-gray-300 transition-colors">joe@reviveleads.net</a>
+              </div>
+            </div>
             <p className="text-xs text-gray-700">
-              © {new Date().getFullYear()} ReviveAI. All rights reserved.
+              © {new Date().getFullYear()} Revive AI LLC. All rights reserved. &nbsp;·&nbsp;{' '}
+              <Link href="/privacy" className="hover:text-gray-500 transition-colors">Privacy Policy</Link>
+              {' '}&nbsp;·&nbsp;{' '}
+              <Link href="/terms" className="hover:text-gray-500 transition-colors">Terms of Service</Link>
             </p>
           </div>
         </div>
