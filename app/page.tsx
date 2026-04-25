@@ -141,7 +141,7 @@ export default function LandingPage() {
               <p className="text-xs font-semibold uppercase tracking-widest text-gray-600 mb-6">How it flows</p>
               <div className="space-y-0">
                 {[
-                  { n: '01', title: 'You give us your old CRM leads', body: 'Doesn't matter if they're 3 months or 3 years old.' },
+                  { n: '01', title: 'You give us your old CRM leads', body: "Doesn't matter if they're 3 months or 3 years old." },
                   { n: '02', title: 'We start real SMS conversations', body: 'Personalized to the vehicle they inquired about. Sounds human. Because the intent is human.' },
                   { n: '03', title: 'Interested leads respond', body: 'We keep the conversation going and qualify them in real-time.' },
                   { n: '04', title: 'Appointments land on your calendar', body: 'Your sales team picks it up from there.' },
@@ -501,7 +501,7 @@ export default function LandingPage() {
               <div className="space-y-3">
                 {[
                   'No slide decks — we show you the actual product',
-                  'We'll estimate your reactivation opportunity on the spot',
+                  "We'll estimate your reactivation opportunity on the spot",
                   'No commitment, no contracts',
                 ].map(item => (
                   <div key={item} className="flex items-center gap-3">
