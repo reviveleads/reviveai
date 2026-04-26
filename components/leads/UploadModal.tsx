@@ -127,6 +127,7 @@ export default function UploadModal({ open, onClose, onLeadsAdded }: Props) {
         dealership_id: '00000000-0000-0000-0000-000000000001',
         first_name: row.first_name,
         last_name: row.last_name,
+        business_name: null,
         phone: row.phone,
         email: row.email || null,
         vehicle_interest: row.vehicle_interest || null,
