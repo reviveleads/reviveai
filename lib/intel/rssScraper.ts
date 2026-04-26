@@ -44,6 +44,13 @@ export async function scrapeAllFeeds(activeBrands: string[]): Promise<ScrapedArt
         seenUrls.add(articleUrl)
 
         const summary = item.description ? item.description.slice(0, 250) : null
+
+        // Discard if neither headline nor summary mentions the brand
+        const brandLower = brand.toLowerCase()
+        const mentionsBrand = headline.toLowerCase().includes(brandLower) ||
+          (summary ?? '').toLowerCase().includes(brandLower)
+        if (!mentionsBrand) continue
+
         const image_url = item.image_url ?? null
         const source = item.source_id ?? item.source_name ?? 'NewsData'
         const published_at = item.pubDate ? new Date(item.pubDate).toISOString() : null
