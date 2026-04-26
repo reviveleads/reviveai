@@ -7,13 +7,15 @@ const DEAL_KEYWORDS = [
 
 const NEW_MODEL_KEYWORDS = [
   'revealed', 'debuts', 'unveiled', 'first look', 'new model',
-  'next generation', 'next-generation', 'redesign', '2026', '2027',
+  'next generation', 'next-generation', '2026', '2027',
 ]
+
+const OLD_MODEL_YEAR_RE = /\b(19\d{2}|20[0-2]\d|2023)\b/
 
 export function classifyArticle(headline: string, summary?: string | null): ArticleType {
   const text = ` ${(headline + ' ' + (summary ?? '')).toLowerCase()} `
   if (DEAL_KEYWORDS.some(k => text.includes(k))) return 'deal'
-  if (NEW_MODEL_KEYWORDS.some(k => text.includes(k))) return 'new_model'
+  if (NEW_MODEL_KEYWORDS.some(k => text.includes(k)) && !OLD_MODEL_YEAR_RE.test(text)) return 'new_model'
   return 'news'
 }
 
