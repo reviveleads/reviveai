@@ -43,7 +43,7 @@ export async function PATCH(
   const body = await request.json()
 
   const allowed = [
-    'first_name', 'last_name', 'phone', 'email', 'vehicle_interest',
+    'first_name', 'last_name', 'business_name', 'phone', 'email', 'vehicle_interest',
     'last_contact_date', 'lead_source', 'status', 'notes', 'sequence_paused', 'ai_paused'
   ]
 

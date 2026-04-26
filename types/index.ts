@@ -17,6 +17,7 @@ export interface Lead {
   dealership_id: string
   first_name: string
   last_name: string
+  business_name: string | null
   phone: string
   email: string | null
   vehicle_interest: string | null

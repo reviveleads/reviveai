@@ -8,7 +8,7 @@ import { format, parseISO } from 'date-fns'
 import {
   ArrowLeft, Phone, Mail, Car, MapPin, Calendar, FileText,
   MessageSquare, Zap, Mail as MailIcon, CheckCircle2, Clock,
-  Send, Loader2, Check, User, AlertTriangle
+  Send, Loader2, Check, User, AlertTriangle, Building2
 } from 'lucide-react'
 import { clsx } from 'clsx'
 
@@ -146,6 +146,12 @@ export default function LeadDetailPage({
               <span className="text-xs text-gray-400 bg-gray-100 rounded-full px-3 py-1">{lead.lead_source}</span>
             )}
           </div>
+          {lead.business_name && (
+            <p className="flex items-center gap-1.5 text-sm text-gray-500 mt-0.5">
+              <Building2 className="h-3.5 w-3.5 text-gray-400 flex-shrink-0" />
+              {lead.business_name}
+            </p>
+          )}
           <div className="flex items-center gap-5 mt-2 flex-wrap">
             <span className="flex items-center gap-1.5 text-sm text-gray-500">
               <Phone className="h-3.5 w-3.5 text-gray-400" /> {formatPhone(lead.phone)}
@@ -186,6 +192,9 @@ export default function LeadDetailPage({
           <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Lead Details</h3>
             <div className="space-y-3">
+              {lead.business_name && (
+                <Detail icon={<Building2 className="h-3.5 w-3.5" />} label="Business" value={lead.business_name} />
+              )}
               <Detail icon={<Phone className="h-3.5 w-3.5" />} label="Phone" value={formatPhone(lead.phone)} />
               <Detail icon={<Mail className="h-3.5 w-3.5" />} label="Email" value={lead.email || '—'} />
               <Detail icon={<Car className="h-3.5 w-3.5" />} label="Vehicle" value={lead.vehicle_interest || '—'} />

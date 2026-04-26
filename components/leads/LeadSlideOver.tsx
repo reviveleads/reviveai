@@ -8,7 +8,7 @@ import { format, parseISO } from 'date-fns'
 import {
   X, Phone, Mail, Car, MapPin, Calendar, FileText,
   Edit2, Check, XCircle, Send, Loader2, Zap, MessageSquare, ExternalLink,
-  GitBranch, Pause, Play, ChevronRight, User, AlertTriangle
+  GitBranch, Pause, Play, ChevronRight, User, AlertTriangle, Building2
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import Link from 'next/link'
@@ -32,7 +32,7 @@ function formatTime(s: string) {
   try { return format(parseISO(s), 'MMM d · h:mm a') } catch { return s }
 }
 
-type EditableFields = Pick<Lead, 'first_name' | 'last_name' | 'phone' | 'email' |
+type EditableFields = Pick<Lead, 'first_name' | 'last_name' | 'business_name' | 'phone' | 'email' |
   'vehicle_interest' | 'last_contact_date' | 'lead_source' | 'notes'>
 
 export default function LeadSlideOver({ leadId, onClose, onLeadUpdated }: Props) {
@@ -107,6 +107,7 @@ setSequences(data.sequences ?? [])
     setEditFields({
       first_name: lead.first_name,
       last_name: lead.last_name,
+      business_name: lead.business_name ?? '',
       phone: lead.phone,
       email: lead.email ?? '',
       vehicle_interest: lead.vehicle_interest ?? '',
@@ -317,6 +318,10 @@ setSequences(data.sequences ?? [])
                         <input value={editFields.last_name} onChange={e => setEditFields(f => f ? {...f, last_name: e.target.value} : f)}
                           className="input-field" />
                       </Field>
+                      <Field label="Business Name" className="col-span-2">
+                        <input value={editFields.business_name ?? ''} onChange={e => setEditFields(f => f ? {...f, business_name: e.target.value} : f)}
+                          placeholder="Optional" className="input-field" />
+                      </Field>
                       <Field label="Phone">
                         <input value={editFields.phone} onChange={e => setEditFields(f => f ? {...f, phone: e.target.value} : f)}
                           className="input-field" />
@@ -344,6 +349,9 @@ setSequences(data.sequences ?? [])
                     </>
                   ) : (
                     <>
+                      {lead.business_name && (
+                        <InfoRow icon={<Building2 className="h-3.5 w-3.5" />} label="Business" value={lead.business_name} className="col-span-2" />
+                      )}
                       <InfoRow icon={<Phone className="h-3.5 w-3.5" />} label="Phone" value={formatPhone(lead.phone)} />
                       <InfoRow icon={<Mail className="h-3.5 w-3.5" />} label="Email" value={lead.email || '—'} />
                       <InfoRow icon={<Car className="h-3.5 w-3.5" />} label="Vehicle" value={lead.vehicle_interest || '—'} className="col-span-2" />
