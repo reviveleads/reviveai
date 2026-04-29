@@ -12,17 +12,8 @@ function isAuthorized(request: NextRequest): boolean {
 
 async function runScrape() {
   const supabase = createAdminClient()
-  const { data: settings } = await supabase
-    .from('dealership_settings')
-    .select('brands_we_sell')
-    .eq('dealership_id', DEMO_DEALERSHIP_ID)
-    .single()
-  const brandsWeSell = settings?.brands_we_sell
-    ? settings.brands_we_sell.split(',').map((b: string) => b.trim()).filter(Boolean)
-    : []
-  if (brandsWeSell.length === 0) return { message: 'No brands configured', inserted: 0 }
-  const articles = await scrapeAllFeeds(brandsWeSell)
-  if (articles.length === 0) return { message: 'No relevant articles found', inserted: 0 }
+  const articles = await scrapeAllFeeds()
+  if (articles.length === 0) return { message: 'No articles found', inserted: 0 }
   const rows = articles.map(a => ({
     dealership_id: DEMO_DEALERSHIP_ID,
     headline: a.headline,
@@ -44,7 +35,7 @@ async function runScrape() {
   }
   await supabase.from('vehicle_news').delete()
     .lt('published_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
-  return { scraped: articles.length, inserted, brands: brandsWeSell }
+  return { scraped: articles.length, inserted }
 }
 
 export async function GET() {
