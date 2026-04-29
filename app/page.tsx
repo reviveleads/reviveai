@@ -39,7 +39,7 @@ export default function LandingPage() {
       </header>
 
       {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <section className="relative flex flex-col items-center px-4 sm:px-6 pt-24 pb-20 overflow-hidden">
+      <section className="relative flex min-h-screen flex-col items-center justify-center px-4 sm:px-6 pt-16 overflow-hidden">
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="h-[700px] w-[700px] rounded-full bg-[#8B0000]/8 blur-[140px]" />
         </div>
