@@ -40,14 +40,35 @@ async function runScrape() {
 
 export async function GET() {
   const supabase = createAdminClient()
-  const { data, error } = await supabase
-    .from('vehicle_news')
-    .select('*')
-    .eq('dealership_id', DEMO_DEALERSHIP_ID)
-    .order('published_at', { ascending: false })
-    .limit(50)
+
+  const [{ data: articles, error }, { data: settings }] = await Promise.all([
+    supabase
+      .from('vehicle_news')
+      .select('*')
+      .eq('dealership_id', DEMO_DEALERSHIP_ID)
+      .order('published_at', { ascending: false })
+      .limit(200),
+    supabase
+      .from('dealership_settings')
+      .select('brands_we_sell')
+      .eq('dealership_id', DEMO_DEALERSHIP_ID)
+      .single(),
+  ])
+
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json(data ?? [])
+
+  const brandsWeSell = settings?.brands_we_sell
+    ? settings.brands_we_sell.split(',').map((b: string) => b.trim().toLowerCase()).filter(Boolean)
+    : []
+
+  const filtered = (articles ?? []).filter(a => {
+    const brand = (a.brand ?? '').toLowerCase()
+    if (brand === 'general') return true
+    if (brandsWeSell.length === 0) return true
+    return brandsWeSell.includes(brand)
+  })
+
+  return NextResponse.json(filtered.slice(0, 50))
 }
 
 export async function POST(request: NextRequest) {
