@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
         })
 
         try {
-          await sendSMS(lead.phone, addSMSFooter(message))
+          await sendSMS(lead.phone, addSMSFooter(message), lead.dealership_id)
         } catch (smsErr: any) {
           console.error(`[sequence] SMS failed for ${lead.id}:`, smsErr.message)
         }

@@ -37,7 +37,7 @@ export async function POST(
     let smsSent = true
     let smsError: string | undefined
     try {
-      await sendSMS(lead.phone, addSMSFooter(prewrittenMessage))
+      await sendSMS(lead.phone, addSMSFooter(prewrittenMessage), lead.dealership_id)
     } catch (err: any) {
       smsSent = false
       smsError = err.message
@@ -116,7 +116,7 @@ export async function POST(
   let smsSent = true
   let smsError: string | undefined
   try {
-    await sendSMS(lead.phone, addSMSFooter(aiMessage))
+    await sendSMS(lead.phone, addSMSFooter(aiMessage), lead.dealership_id)
   } catch (err: any) {
     smsSent = false
     smsError = err.message

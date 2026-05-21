@@ -193,7 +193,7 @@ export async function POST(request: NextRequest) {
       body
     )
 
-    await sendSMS(from, addSMSFooter(aiReply))
+    await sendSMS(from, addSMSFooter(aiReply), lead.dealership_id)
 
     await supabase.from('conversations').insert({
       lead_id: lead.id,

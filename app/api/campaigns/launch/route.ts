@@ -121,7 +121,7 @@ export async function POST(_request: NextRequest) {
       await supabase.from('leads').update({ status: 'contacted' }).eq('id', lead.id)
 
       try {
-        await sendSMS(lead.phone, addSMSFooter(aiMessage))
+        await sendSMS(lead.phone, addSMSFooter(aiMessage), DEMO_DEALERSHIP_ID)
       } catch (smsErr: any) {
         console.error(`[campaign] SMS failed for lead ${lead.id}:`, smsErr.message)
       }
